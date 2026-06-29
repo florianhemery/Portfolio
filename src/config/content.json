@@ -1,0 +1,278 @@
+{
+  "personal": {
+    "name": "Florian Hémery",
+    "title": "Full-Stack Developer & DevOps",
+    "subtitle": "Epitech — Tek 2 · Promo 2029",
+    "email": "florian.hemery@epitech.eu",
+    "github": "https://github.com/florianhemery",
+    "linkedin": "https://www.linkedin.com/in/florian-hemery",
+    "photo": "/moi.jpg",
+    "bio": "Passionné par la technologie depuis l'enfance, mon parcours à Epitech a été marqué par une prise de conscience décisive. J'ai effectué mon stage de Tek 2 à la DSI Digital JCDecaux (août–décembre 2025), puis enchaîné sur la piscine Tek 2 en janvier 2026. Je suis actuellement en Tek 2 jusqu'à début juillet. Les données de ce portfolio proviennent exclusivement de mes relevés Epitech."
+  },
+  "stats": [
+    { "id": "stat-projects", "label": "Projets Epitech & stage", "value": 75, "suffix": "" },
+    { "id": "stat-categories", "label": "Catégories de modules", "value": 17, "suffix": "" }
+  ],
+  "parcoursSteps": [
+    { "id": "step-tek1", "year": "Oct. 2023 – Juil. 2024", "title": "Tek 1", "desc": "Première année Epitech. Découverte du C et de la programmation système.", "tag": "Epitech" },
+    { "id": "step-conscience", "year": "2024", "title": "Prise de conscience", "desc": "Passage d'une énergie brute à une méthode de travail structurée.", "tag": "Epitech" },
+    { "id": "step-redoublement", "year": "Oct. 2024 – Juil. 2025", "title": "Consolidation Tek 1", "desc": "Renforcement des fondamentaux : Piscine C, my_printf, premiers projets Unix et maths.", "tag": "Epitech" },
+    { "id": "step-stage", "year": "Fin août – Déc. 2025", "title": "Stage — JCDecaux", "desc": "Début de la Tek 2 par le stage. Développeur Full-Stack à la DSI Digital (Dependency Checker, Service Health Dashboard).", "tag": "Pro" },
+    { "id": "step-piscine-tek2", "year": "Janv. 2026", "title": "Piscine Tek 2", "desc": "Retour à l'école : piscine C++, projets (Rush, Krell, etc.).", "tag": "Epitech" },
+    { "id": "step-tek2-cours", "year": "2026", "title": "Tek 2 en cours", "desc": "Suite du cursus Tek 2 jusqu'à début juillet.", "tag": "Epitech" }
+  ],
+  "parcoursCategories": [
+    {
+      "id": "piscine-c",
+      "label": "Piscine C",
+      "module": "G-CPE-100",
+      "projects": [
+        {
+          "title": "Piscine C — Tek 1",
+          "year": "2023",
+          "module": "G-CPE-100",
+          "grade": null,
+          "longDesc": "Première immersion en C : C Pool Day 01 à 13, Rush 1 & 2, Star, count_island, mini_printf, my_printf, Final Stumper. Découverte des pointeurs, de la gestion mémoire et de la norme Epitech.",
+          "skills": ["C", "Algorithmie", "Gestion mémoire", "Norme Epitech"]
+        },
+        {
+          "title": "Piscine C — Renforcement",
+          "year": "2024",
+          "module": "G-CPE-100",
+          "grade": null,
+          "longDesc": "Renforcement intensif en C : Rush 1 (22/25), defenses orales et mini_printf validé 20/20. Méthodologie et qualité de code au cœur.",
+          "skills": ["C", "Qualité de code", "Travail en équipe", "Défenses orales"]
+        }
+      ]
+    },
+    {
+      "id": "c-printf",
+      "label": "C & printf",
+      "module": "G-CPE-101",
+      "projects": [
+        {
+          "title": "my_printf",
+          "year": "2024",
+          "module": "G-CPE-101",
+          "grade": null,
+          "longDesc": "Réimplémentation de printf en C : gestion des flags (d, i, s, c), tests unitaires (80 % de lignes couvertes) et pointeurs sur fonctions.",
+          "skills": ["C", "stdarg", "Pointeurs sur fonctions", "Tests unitaires"]
+        },
+        {
+          "title": "mini_printf",
+          "year": "2024",
+          "module": "G-CPE-101",
+          "grade": "20",
+          "longDesc": "Version complète de printf : simple print, flags c/s/d/i, options multiples. Validé 20/20.",
+          "skills": ["C", "Variadiques", "Formatage"]
+        }
+      ]
+    },
+    {
+      "id": "maths",
+      "label": "Mathématiques",
+      "module": "G-MAT",
+      "projects": [
+        { "title": "101pong", "year": "2024", "module": "G-MAT-100", "grade": "17,3", "longDesc": "Simulation de balle : vecteurs, trigonométrie et rigueur mathématique.", "skills": ["C", "Maths", "Vecteurs"] },
+        { "title": "102architect", "year": "2024", "module": "G-MAT-100", "grade": null, "longDesc": "Transformations matricielles : translation, homothétie et rotation.", "skills": ["C", "Matrices"] },
+        { "title": "103cipher", "year": "2024", "module": "G-MAT-100", "grade": null, "longDesc": "Chiffrement et déchiffrement par matrices.", "skills": ["C", "Cryptographie"] },
+        { "title": "104neutrinos", "year": "2025", "module": "G-MAT-100", "grade": null, "longDesc": "Calculs statistiques sur des séries numériques.", "skills": ["C", "Statistiques"] },
+        { "title": "105demography", "year": "2025", "module": "G-MAT-100", "grade": null, "longDesc": "Étude démographique : corrélations et ajustements de courbes.", "skills": ["C", "Données"] },
+        { "title": "106bombyx", "year": "2024-2025", "module": "G-MAT-200", "grade": null, "longDesc": "Modélisation de l'évolution d'une population.", "skills": ["C", "Modélisation"] },
+        { "title": "107transfer", "year": "2025", "module": "G-MAT-200", "grade": null, "longDesc": "Fonction de transfert : polynômes et rigueur mathématique (85 % de lignes couvertes).", "skills": ["C", "Polynômes"] },
+        { "title": "108trigo", "year": "2025", "module": "G-MAT-200", "grade": null, "longDesc": "Fonctions trigonométriques : sinus, cosinus et fonctions hyperboliques.", "skills": ["C", "Trigo"] },
+        { "title": "109titration", "year": "2025", "module": "G-MAT-200", "grade": null, "longDesc": "Projet de chimie : calcul de titrage et modélisation.", "skills": ["C", "Chimie"] },
+        { "title": "110borwein", "year": "2025", "module": "G-MAT-200", "grade": "20", "longDesc": "Intégration numérique : Simpson, point milieu, trapèzes. Version validée 20/20.", "skills": ["C", "Intégration numérique"] }
+      ]
+    },
+    {
+      "id": "unix",
+      "label": "Unix & Shell",
+      "module": "G-PSU",
+      "projects": [
+        { "title": "my_ls", "year": "2024", "module": "G-PSU-100", "grade": null, "longDesc": "Réimplémentation de ls : lecture de répertoires (opendir/readdir) et option -l.", "skills": ["C", "opendir", "readdir", "Unix"] },
+        { "title": "my_top", "year": "2024", "module": "G-PSU-100", "grade": null, "longDesc": "Moniteur système type top : lecture de /proc et interface Ncurses.", "skills": ["C", "Ncurses", "/proc"] },
+        { "title": "my_sokoban", "year": "2023-2024", "module": "G-PSU-100", "grade": null, "longDesc": "Jeu Sokoban en C : parsing de cartes et logique de déplacements.", "skills": ["C", "Parsing", "Jeu"] },
+        { "title": "my_navy", "year": "2024", "module": "G-PSU-100", "grade": null, "longDesc": "Bataille navale en réseau via signaux : protocole et logique de jeu.", "skills": ["C", "Signaux", "Réseau"] },
+        { "title": "my_sudo", "year": "2025", "module": "G-PSU-100", "grade": null, "longDesc": "Réimplémentation partielle de sudo : gestion des permissions et des erreurs.", "skills": ["C", "Système", "Permissions"] },
+        { "title": "Minishell 1", "year": "2024-2025", "module": "G-PSU-200", "grade": null, "longDesc": "Premier prototype de shell en C.", "skills": ["C", "Shell"] },
+        { "title": "Minishell 2", "year": "2025", "module": "G-PSU-200", "grade": "19,6", "longDesc": "Shell complet : gestion du PATH, builtins (cd, setenv, unsetenv), pipes, redirections et séparateurs.", "skills": ["C", "Shell", "Pipes", "Redirections"] },
+        { "title": "42sh", "year": "2025", "module": "G-PSU-200", "grade": null, "longDesc": "Shell UNIX complet en C : pipes, redirections, builtins, job control et gestion des processus.", "skills": ["C", "Shell", "Job control"] }
+      ]
+    },
+    {
+      "id": "cpe",
+      "label": "Programmation C avancée",
+      "module": "G-CPE",
+      "projects": [
+        { "title": "Setting Up", "year": "2024", "module": "G-CPE-110", "grade": null, "longDesc": "Manipulation de fichiers : ouverture, lecture et bootstrap.", "skills": ["C", "Fichiers", "Bootstrap"] },
+        { "title": "Organized", "year": "2024", "module": "G-CPE-110", "grade": null, "longDesc": "Organisation mémoire : tableaux à deux dimensions.", "skills": ["C", "Mémoire"] },
+        { "title": "Secured", "year": "2024-2025", "module": "G-CPE-110", "grade": null, "longDesc": "Table de hachage : fonction de hachage, structure de données et tests.", "skills": ["C", "Structures de données", "Hash table"] },
+        { "title": "Robot Factory", "year": "2025", "module": "G-CPE-200", "grade": null, "longDesc": "Analyse syntaxique de programmes : parsing robuste et structures de données.", "skills": ["C", "Parsing", "Robustness"] },
+        { "title": "A-Maze-d", "year": "2025", "module": "G-CPE-200", "grade": null, "longDesc": "Génération et résolution de labyrinthes : algorithmes de graphes.", "skills": ["C", "Graphes", "Algorithmes"] },
+        { "title": "Corewar", "year": "2025", "module": "G-CPE-200", "grade": null, "longDesc": "Machine virtuelle et langage assembleur : interpréteur de bytecode, jeu d'instructions et gestion de la mémoire.", "skills": ["C", "VM", "Assembleur"] },
+        { "title": "Solo Stumpers 1-10", "year": "2024-2025", "module": "G-CPE-210", "grade": "20", "longDesc": "Série d'exercices algorithmiques courts : style, tests et rapidité. Plusieurs validés 20/20.", "skills": ["C", "Rapidité", "Norme"] },
+        { "title": "Stumpers 4-7", "year": "2025", "module": "G-CPE-210", "grade": null, "longDesc": "Exercices d'algorithmie : fridge, tic-tac-toe, chiffre de César.", "skills": ["C", "Stumpers"] }
+      ]
+    },
+    {
+      "id": "graphique",
+      "label": "Graphique & Jeux",
+      "module": "G-MUL / G-ING",
+      "projects": [
+        { "title": "MyHunter", "year": "2023-2025", "module": "G-MUL-100", "grade": "21", "longDesc": "Jeu type duck hunt (CSFML) : score, niveaux, animations et son.", "skills": ["C", "CSFML", "Sprites", "Events"] },
+        { "title": "MyRadar", "year": "2023-2024", "module": "G-MUL-100", "grade": null, "longDesc": "Simulation radar (CSFML) : avions, tours et détection de collisions.", "skills": ["C", "CSFML", "Simulation"] },
+        { "title": "MyPaint", "year": "2024", "module": "B-MUL-200", "grade": null, "longDesc": "Logiciel de dessin (CSFML) : fenêtre, palette et outils.", "skills": ["C", "CSFML", "UI"] },
+        { "title": "MyRPG", "year": "2025", "module": "B-MUL-200", "grade": null, "longDesc": "RPG 2D (CSFML) : menus, fenêtres et gestion d'événements.", "skills": ["C", "CSFML", "RPG"] },
+        { "title": "MyWorld", "year": "2025", "module": "G-ING-200", "grade": "25", "longDesc": "Générateur 3D procédural (CSFML) : textures par altitude, zoom, rotation et niveaux.", "skills": ["C", "CSFML", "3D", "Procédural"] }
+      ]
+    },
+    {
+      "id": "pro",
+      "label": "Communication & Pro",
+      "module": "G-PRO",
+      "projects": [
+        { "title": "Professional e-mail", "year": "2023-2024", "module": "G-PRO-100", "grade": "18", "longDesc": "Rédaction d'un mail professionnel : rigueur, pertinence et mise en page.", "skills": ["Communication", "Rédaction"] },
+        { "title": "Prepare a review", "year": "2024-2025", "module": "G-PRO-100", "grade": "16", "longDesc": "Vidéo de review de projet : structure, précision et support visuel.", "skills": ["Présentation", "Vidéo"] },
+        { "title": "MCQ", "year": "2024-2025", "module": "G-PRO-100", "grade": null, "longDesc": "QCM professionnel.", "skills": ["Pro"] },
+        { "title": "3 emails", "year": "2024", "module": "G-PRO-200", "grade": null, "longDesc": "Échanges professionnels par mail : adaptation et motivation.", "skills": ["Mail", "Candidature"] },
+        { "title": "Writing an user guide", "year": "2024", "module": "G-PRO-200", "grade": "19", "longDesc": "Guide utilisateur : étapes claires, vocabulaire précis et mise en page soignée.", "skills": ["Documentation", "Rédaction"] },
+        { "title": "Memo", "year": "2024", "module": "G-PRO-200", "grade": null, "longDesc": "Rédaction d'un mémo professionnel.", "skills": ["Mémo", "Pro"] },
+        { "title": "Delicate Mission", "year": "2026", "module": "G-PRO-400", "grade": "17", "longDesc": "Communication professionnelle de gestion d'incident : mail complet et structuré, cadrage de l'erreur, rappel de l'impact et solutions proposées pour le présent et le futur.", "skills": ["Communication", "Gestion d'incident", "Rédaction"] }
+      ]
+    },
+    {
+      "id": "devops",
+      "label": "DevOps",
+      "module": "G-DOP",
+      "projects": [
+        { "title": "Popeye", "year": "2024", "module": "G-DOP-200", "grade": null, "longDesc": "Application conteneurisée : images Poll, Result et Worker, orchestration Docker Compose.", "skills": ["Docker", "CI", "Images"] },
+        { "title": "Defense Chocolatine", "year": "2024", "module": "G-DOP-200", "grade": null, "longDesc": "Pipeline CI GitHub Actions : coding style, compilation, tests et mirroring.", "skills": ["GitHub Actions", "CI"] },
+        { "title": "my_marvin", "year": "2026", "module": "G-DOP-400", "grade": "20", "longDesc": "Configuration as code d'un serveur Jenkins : configuration globale, utilisateurs, rôles, jobs et dossiers. Validé 20/20.", "skills": ["Jenkins", "CI/CD", "Configuration as code", "DevOps"] },
+        { "title": "Octopus", "year": "2026", "module": "G-DOP-400", "grade": null, "longDesc": "Déploiement automatisé avec Ansible : playbook idempotent basé sur des rôles, services Redis, PostgreSQL, poll/worker/result et gestion via systemd.", "skills": ["Ansible", "Linux", "PostgreSQL", "Redis", "systemd"] }
+      ]
+    },
+    {
+      "id": "web",
+      "label": "Web",
+      "module": "G-WEB",
+      "projects": [
+        { "title": "EPyTodo", "year": "2025", "module": "G-WEB-200", "grade": null, "longDesc": "Application Todo (Python) : authentification JWT, hachage des mots de passe et API REST.", "skills": ["Python", "Web", "JWT"] }
+      ]
+    },
+    {
+      "id": "securite",
+      "label": "Sécurité",
+      "module": "G-SEC",
+      "projects": [
+        { "title": "Defense Burp", "year": "2024-2025", "module": "G-SEC-200", "grade": null, "longDesc": "CTF sécurité : Nmap, Gobuster, concepts de pentest et résolution de challenges.", "skills": ["CTF", "Sécurité"] },
+        { "title": "Obsidian", "year": "2025", "module": "G-SEC-210", "grade": "19", "longDesc": "Analyse d'exploits : valeurs codées en dur, buffer underflow, integer overflow et injection de commandes. Rapport et keynote.", "skills": ["Sécurité", "Exploits", "Rapport"] }
+      ]
+    },
+    {
+      "id": "ia",
+      "label": "Intelligence artificielle",
+      "module": "G-AIA",
+      "projects": [
+        { "title": "Tardis", "year": "2025", "module": "G-AIA-210", "grade": "21", "longDesc": "Prédiction des retards SNCF : dataset, preprocessing, Random Forest, GridSearchCV et interface. Defense finale notée 21.", "skills": ["Python", "ML", "Scikit-learn", "Data"] },
+        { "title": "CVRIE", "year": "2026", "module": "G-AIA-400", "grade": "17,5", "longDesc": "Analyse de données médicales par apprentissage non supervisé : nettoyage du dataset, tokenisation, TF-IDF, clustering (10 clusters) et notebook documenté avec représentations graphiques.", "skills": ["Python", "Machine Learning", "Clustering", "NLP", "Data"] },
+        { "title": "Codename", "year": "2026", "module": "G-AIA-410", "grade": "22", "longDesc": "Prompt engineering offensif et défensif sur LLM (Ollama) : conception de prompts d'attaque et de défense, stratégies de protection contre les fuites d'informations.", "skills": ["LLM", "Prompt engineering", "Ollama", "Sécurité IA"] },
+        { "title": "Start Trek", "year": "2026", "module": "G-AIA-401", "grade": null, "longDesc": "Apprentissage par renforcement : agents Q-learning et DQN entraînés sur une baseline, logging, hyperparamètres et analyse exploration/exploitation.", "skills": ["Python", "Reinforcement Learning", "DQN", "Q-learning"] },
+        { "title": "Persona", "year": "2026", "module": "G-AIA-410", "grade": null, "longDesc": "Agent IA d'automatisation (n8n) : agent Groq, authentification OTP, envoi de newsletters formatées en HTML et déploiement Docker.", "skills": ["IA", "n8n", "Automation", "Docker"] },
+        { "title": "Need4Stek", "year": "2025", "module": "B-AIA-200", "grade": null, "longDesc": "Projet d'intelligence artificielle (Technical Assessment Module).", "skills": ["IA"] }
+      ]
+    },
+    {
+      "id": "anglais",
+      "label": "Anglais",
+      "module": "G-ENG",
+      "projects": [
+        { "title": "TEPitech", "year": "2023-2026", "module": "G-ENG-001", "grade": "550", "longDesc": "Tests d'anglais (compréhension orale et écrite, conversations). Meilleur score : 550.", "skills": ["Anglais"] },
+        { "title": "Get That Internship", "year": "2024", "module": "G-ENG-200", "grade": null, "longDesc": "Recherche de stage en anglais : pertinence, organisation et lettre de motivation.", "skills": ["Anglais", "Candidature"] },
+        { "title": "Create an Epitech campus", "year": "2024-2025", "module": "G-ENG-199", "grade": null, "longDesc": "Présentation en anglais sur le campus du futur : recherche, rédaction, oral et supports visuels.", "skills": ["Anglais", "Présentation"] },
+        { "title": "Pitch Your Video Game", "year": "2025", "module": "G-ENG-200", "grade": null, "longDesc": "Pitch investisseur en anglais : recherche, organisation, supports visuels et aisance. Essai noté 17/20.", "skills": ["Anglais", "Pitch"] }
+      ]
+    },
+    {
+      "id": "stage",
+      "label": "Stage",
+      "module": "G-PRO-300",
+      "projects": [
+        { "title": "Ecrit de stage", "year": "2026", "module": "G-PRO-300", "grade": "15,33", "longDesc": "Rapport de stage : contenu solide et travail remarquable sur les visuels.", "skills": ["Rédaction", "Rapport"] },
+        { "title": "Évaluation entreprise", "year": "2026", "module": "G-PRO-300", "grade": "18,67", "longDesc": "Florian was a great student. He succeeded in managing 2 problematics. Both were implemented and shared with potential users. He was autonomous to learn, to progress and to manage his time. Great job.", "skills": ["Stage", "Autonomie"] },
+        { "title": "Soutenance de stage", "year": "2026", "module": "G-PRO-300", "grade": "20", "longDesc": "Excellente soutenance : claire, détaillée et dynamique. Gestion du temps et support très soignés, expression orale excellente, forte aptitude au monde professionnel.", "skills": ["Présentation", "Soutenance"] }
+      ]
+    },
+    {
+      "id": "piscine-cpp",
+      "label": "Piscine C++",
+      "module": "G-PDG-300",
+      "projects": [
+        { "title": "Rush 1 — Defense", "year": "2026", "module": "G-PDG-300", "grade": "18", "longDesc": "Rush C++ : préliminaires et exercices validés.", "skills": ["C++"] },
+        { "title": "Rush 2 — Defense", "year": "2026", "module": "G-PDG-300", "grade": "33", "longDesc": "Pushswap en Haskell : 20/20 aux tests, coding style 5/5, bonus 5/5. Séparation des entrées/sorties et programmation monadique.", "skills": ["Haskell", "Algorithmes"] },
+        { "title": "Rush 3 — Defense", "year": "2026", "module": "G-PDG-300", "grade": "15,5", "longDesc": "Abstract VM en C++ : interface IOperand, factory, pile, gestion d'erreurs et polymorphisme.", "skills": ["C++", "VM", "Polymorphisme"] },
+        { "title": "Rush 4 — Defense (Krell)", "year": "2026", "module": "G-PDG-300", "grade": "15,6", "longDesc": "Moniteur système modulaire en C++ : namespace Krell, interfaces IDisplay/IModule, reflection, modules (hostname, kernel, date, CPU, RAM), nCurses et SFML.", "skills": ["C++", "Modules", "nCurses", "SFML"] },
+        { "title": "Pitch (Hackaton)", "year": "2026", "module": "G-EPI-300", "grade": "16", "longDesc": "Visualisation de données : carte, clusters, filtres et timeline. Astro, React, TS et D3. Déployé sur Vercel.", "skills": ["React", "TypeScript", "D3", "Vercel"] }
+      ]
+    },
+    {
+      "id": "autres",
+      "label": "Autres",
+      "module": null,
+      "projects": [
+        { "title": "Epitech Jam", "year": "2024", "module": "G-JAM-001", "grade": null, "longDesc": "Game jam sur le thème olympique (Godot) : créativité et cohérence d'univers.", "skills": ["Game Jam", "Godot"] },
+        { "title": "Game Jam", "year": "2025", "module": "G-INN-010", "grade": null, "longDesc": "Game jam (Pygame) : effets sonores et musique faits maison, gameplay fun.", "skills": ["Python", "Pygame", "Game Jam"] },
+        { "title": "Game Jam #2", "year": "2026", "module": "G-INN-010", "grade": null, "longDesc": "Game jam en 3D (Godot) : jeu d'escorte de tortues vers la mer, pouvoirs, marée dynamique et effets de lumière.", "skills": ["Godot", "3D", "Game Jam"] }
+      ]
+    },
+    {
+      "id": "systeme-avance",
+      "label": "Systèmes avancés (C++)",
+      "module": "G-OOP / G-CNA",
+      "projects": [
+        { "title": "Interstonar", "year": "2026", "module": "G-CNA-400", "grade": "18", "longDesc": "Simulation de voyage spatial : calcul de trajectoires en mode global et local, gestion des collisions et optimisation. Rigueur numérique.", "skills": ["C++", "Maths", "Simulation", "Vecteurs"] },
+        { "title": "Raytracer", "year": "2026", "module": "G-OOP-400", "grade": "14,5", "longDesc": "Moteur de raytracing en C++ : primitives et lumières via interfaces purement virtuelles, design patterns (composite, factory), transformations et configuration de scène.", "skills": ["C++", "Raytracing", "Design patterns", "3D"] },
+        { "title": "NanoTekSpice", "year": "2026", "module": "G-OOP-400", "grade": null, "longDesc": "Simulateur de circuit logique en C++ : composants élémentaires et portes, parsing de fichiers, classes abstraites, polymorphisme et exceptions personnalisées.", "skills": ["C++", "POO", "Parsing", "Simulation"] }
+      ]
+    },
+    {
+      "id": "reseau",
+      "label": "Réseau & Concurrence",
+      "module": "G-CCP / G-YEP",
+      "projects": [
+        { "title": "Plazza", "year": "2026", "module": "G-CCP-400", "grade": "18", "longDesc": "Pizzeria concurrente en C++ : multithreading, thread pool complète, communication inter-processus (pipes nommés) encapsulée et sérialisation.", "skills": ["C++", "Multithreading", "IPC", "Concurrence"] },
+        { "title": "Zappy", "year": "2026", "module": "G-YEP-400", "grade": null, "longDesc": "Jeu réseau multijoueur (serveur, interface graphique, IA) : serveur en poll non bloquant, architecture en couches, gestion des buffers et du protocole.", "skills": ["C++", "Réseau", "poll", "Jeu multijoueur"] }
+      ]
+    }
+  ],
+  "projects": [],
+  "skills": [
+    { "name": "C", "category": "Systems", "icon": "⚙" },
+    { "name": "C++", "category": "Systems", "icon": "⚙" },
+    { "name": "Haskell", "category": "Systems", "icon": "λ" },
+    { "name": "Python", "category": "Backend", "icon": "🐍" },
+    { "name": "JavaScript", "category": "Frontend", "icon": "⚡" },
+    { "name": "React", "category": "Frontend", "icon": "⚛" },
+    { "name": "HTML / CSS", "category": "Frontend", "icon": "🎨" },
+    { "name": "CSFML", "category": "Systems", "icon": "🎮" },
+    { "name": "Linux / Bash", "category": "Systems", "icon": "🐧" },
+    { "name": "Docker", "category": "DevOps", "icon": "🐳" },
+    { "name": "Git / GitLab CI", "category": "DevOps", "icon": "🔀" },
+    { "name": "Ansible", "category": "DevOps", "icon": "📦" },
+    { "name": "Jenkins", "category": "DevOps", "icon": "🧰" },
+    { "name": "XWiki", "category": "Frontend", "icon": "📝" },
+    { "name": "Scikit-learn", "category": "Data", "icon": "📊" }
+  ],
+  "testimonials": [
+    {
+      "id": "jcdecaux-2026",
+      "text": "Florian was a great student. He succeeded in managing 2 problematics. Both were implemented, shared with potential users. He also was able to be autonomous to learn, to progress, to manage his time. So great job.",
+      "text_fr": "Florian a été un excellent stagiaire. Il a su mener à bien deux problématiques. Les deux ont été implémentées et partagées avec les utilisateurs potentiels. Il a aussi fait preuve d'autonomie pour apprendre, progresser et gérer son temps. Très bon travail.",
+      "author": "DSI Digital JCDecaux",
+      "role": "Évaluation entreprise (stage)",
+      "role_en": "Company evaluation (internship)"
+    }
+  ],
+  "navLinks": ["about", "skills", "timeline", "projects", "stats", "contact"],
+  "terminalCommands": {}
+}

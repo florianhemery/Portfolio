@@ -1,0 +1,277 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   DESIGN SYSTEM - Florian Hemery
+   Registre editorial / premium, dark mode profond, un seul accent maitrise.
+   Les tokens vivent ici (Tailwind v4 @theme + variables CSS) et alimentent
+   toutes les utilities (bg-bg, text-fg, border-line, text-accent, etc.).
+   ========================================================================== */
+
+@theme {
+  /* ----- Couleurs : fonds, surfaces, texte ----- */
+  --color-bg: #0a0a0b; /* fond profond principal */
+  --color-bg-soft: #0e0e10; /* alternance de section */
+  --color-surface: #141417; /* cartes, panneaux */
+  --color-surface-2: #1a1a1f; /* surface elevee (hover, modale) */
+
+  --color-fg: #f5f5f6; /* texte principal, presque blanc */
+  --color-muted: #a1a1aa; /* texte secondaire */
+  --color-faint: #71717a; /* labels, legendes */
+
+  /* ----- Bordures fines a faible opacite ----- */
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* ----- Accent unique : bleu electrique Epitech ----- */
+  --color-accent: #1f3cff;
+  --color-accent-bright: #5e79ff;
+  --color-accent-dim: #1730d0;
+  /* Teinte accent en rgb pour composer des rgba() (glow, halos) */
+  --color-accent-rgb: 31, 60, 255;
+
+  /* ----- Typographie : Geist (display + UI), Geist Mono (eyebrows) ----- */
+  --font-sans: "Geist Variable", "Inter Variable", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", monospace;
+
+  /* ----- Echelle typographique fluide (clamp) pour les grands titres ----- */
+  --text-display: clamp(2.75rem, 7vw, 6.5rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.04em;
+
+  --text-h2: clamp(2rem, 4.5vw, 3.5rem);
+  --text-h2--line-height: 1.02;
+  --text-h2--letter-spacing: -0.03em;
+
+  /* ----- Rythme / rayons ----- */
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  /* ----- Easings & transitions ----- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Degrades radiaux discrets en fond de page (halos d'accent tres doux) */
+    background-image:
+      radial-gradient(
+        60rem 60rem at 80% -10%,
+        rgba(var(--color-accent-rgb), 0.1),
+        transparent 60%
+      ),
+      radial-gradient(
+        50rem 50rem at -10% 20%,
+        rgba(var(--color-accent-rgb), 0.06),
+        transparent 55%
+      );
+    background-attachment: fixed;
+  }
+
+  /* Selection a l'accent */
+  ::selection {
+    background-color: rgba(var(--color-accent-rgb), 0.28);
+    color: var(--color-fg);
+  }
+
+  /* Focus states soignes et coherents */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Scrollbar discrete */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+    border: 2px solid var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-accent-rgb), 0.5);
+  }
+}
+
+/* ==========================================================================
+   UTILITAIRES MAISON
+   ========================================================================== */
+
+@layer utilities {
+  /* Conteneur editorial : largeur maitrisee + gouttieres responsives.
+     Elargi sur grands ecrans (16:9, 1440p, ultrawide) pour mieux occuper
+     l'espace sans casser la lisibilite. */
+  .container-editorial {
+    width: 100%;
+    max-width: 88rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .container-editorial {
+      padding-inline: 2.5rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .container-editorial {
+      max-width: 96rem;
+      padding-inline: 3.5rem;
+    }
+  }
+  @media (min-width: 1700px) {
+    .container-editorial {
+      max-width: 108rem;
+      padding-inline: 5rem;
+    }
+  }
+
+  /* Eyebrow : petit label mono en capitales, signature du design */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  /* Texte en degrade d'accent pour les mots cles des titres */
+  .text-gradient-accent {
+    background: linear-gradient(
+      180deg,
+      var(--color-fg) 0%,
+      var(--color-accent-bright) 130%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Surface vitree fine (cartes premium) */
+  .surface-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xl);
+  }
+
+  /* ----- LIQUID GLASS -----
+     Verre depoli translucide au-dessus du champ de particules : ameliore la
+     lisibilite et donne du relief. Le flou agit sur ce qui est peint derriere
+     (le canvas 3D + le fond). On garde l'effet sobre et coherent. */
+  .glass {
+    position: relative;
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.07),
+      rgba(255, 255, 255, 0.025)
+    );
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Liseré clair en haut (arete du verre) + ombre portee douce = relief */
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.25),
+      0 10px 34px -12px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Reflet diagonal subtil facon "liquide" (pur decor, sans interaction) */
+  .glass::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      130deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 28%,
+      transparent 72%,
+      rgba(var(--color-accent-rgb), 0.06) 100%
+    );
+  }
+
+  /* Variante plus opaque pour les panneaux qui portent beaucoup de texte
+     (modale, scrim de lisibilite) : flou plus marque, meilleur contraste. */
+  .glass-panel {
+    background-image: linear-gradient(
+      180deg,
+      rgba(18, 18, 22, 0.72),
+      rgba(12, 12, 15, 0.6)
+    );
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+      0 16px 50px -16px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Petite securite : si backdrop-filter n'est pas supporte, on retombe sur
+     des fonds plus opaques pour garder la lisibilite. */
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass {
+      background-color: rgba(20, 20, 24, 0.85);
+    }
+    .glass-panel {
+      background-color: rgba(14, 14, 17, 0.92);
+    }
+  }
+
+  /* Voile de lisibilite sous les sections de texte : assombrit le champ de
+     particules derriere le contenu (fondu doux depuis le hero transparent),
+     pour que le texte reste parfaitement lisible. */
+  .content-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(10, 10, 11, 0) 0,
+      rgba(10, 10, 11, 0.78) 160px,
+      rgba(10, 10, 11, 0.82) 100%
+    );
+  }
+
+  /* Grain / noise subtil applique en overlay fixe (voir .grain plus bas) */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.035;
+    /* Texture de bruit generee en SVG (fractalNoise), encodee inline */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+}
