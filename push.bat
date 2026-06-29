@@ -12,7 +12,7 @@ git remote remove origin 2>nul
 git remote add origin https://github.com/florianhemery/Portfolio.git
 git branch -M main
 echo === Push vers GitHub ===
-git push -u origin main
+git push -u origin main --force
 echo.
 echo === Termine ! ===
 pause
