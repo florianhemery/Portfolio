@@ -36,6 +36,7 @@ export default function Skills() {
   return (
     <Section
       id="skills"
+      index={2}
       eyebrow={t.skills.eyebrow}
       title={t.skills.title}
       subtitle={t.skills.subtitle}

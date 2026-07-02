@@ -39,7 +39,7 @@ export default function Stats() {
   const { t } = useLang();
 
   return (
-    <Section id="stats" eyebrow={t.stats.eyebrow} title={t.stats.title}>
+    <Section id="stats" index={5} eyebrow={t.stats.eyebrow} title={t.stats.title}>
       <motion.div
         className="grid gap-5 sm:grid-cols-2"
         variants={staggerContainer}

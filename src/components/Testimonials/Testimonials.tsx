@@ -12,6 +12,7 @@ export default function Testimonials() {
   return (
     <Section
       id="testimonials"
+      index={6}
       eyebrow={t.testimonials.eyebrow}
       title={t.testimonials.title}
     >

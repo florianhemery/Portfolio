@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import Section from "../Section";
+import Magnetic from "../ui/Magnetic";
 import { content } from "../../config/content";
 import { useLang } from "../../i18n/LangContext";
 import { fadeUp, revealViewport, staggerContainer } from "../../lib/animations";
@@ -20,7 +21,12 @@ export default function Contact() {
   ];
 
   return (
-    <Section id="contact" eyebrow={t.contact.eyebrow} title={t.contact.title}>
+    <Section
+      id="contact"
+      index={7}
+      eyebrow={t.contact.eyebrow}
+      title={t.contact.title}
+    >
       <motion.div
         className="glass-panel rounded-2xl p-8 sm:p-12"
         variants={staggerContainer}
@@ -35,16 +41,19 @@ export default function Contact() {
           {t.contact.subtitle}
         </motion.p>
 
-        <motion.a
-          variants={fadeUp}
-          href={`mailto:${personal.email}`}
-          className="group mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-white transition-transform duration-200 hover:scale-[1.03] focus-visible:scale-[1.03]"
-        >
-          {t.contact.emailCta}
-          <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-            →
-          </span>
-        </motion.a>
+        <motion.div variants={fadeUp} className="mt-8">
+          <Magnetic>
+            <a
+              href={`mailto:${personal.email}`}
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-white transition-colors duration-300"
+            >
+              {t.contact.emailCta}
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
+            </a>
+          </Magnetic>
+        </motion.div>
 
         <motion.ul
           variants={fadeUp}
@@ -59,7 +68,7 @@ export default function Contact() {
                 className="block"
               >
                 <span className="eyebrow">{link.label}</span>
-                <span className="mt-1 block text-fg transition-colors group-hover:text-accent hover:text-accent">
+                <span className="link-underline mt-1 inline-block text-fg transition-colors hover:text-accent-bright">
                   {link.value}
                 </span>
               </a>

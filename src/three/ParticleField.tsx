@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import {
+  Bloom,
+  ChromaticAberration,
+  EffectComposer,
+  Vignette,
+} from "@react-three/postprocessing";
 import { useReducedMotion } from "motion/react";
 import * as THREE from "three";
 
@@ -9,8 +14,12 @@ import {
   particleVertexShader,
 } from "./particleShaders";
 import {
+  buildContactPositions,
+  buildGlyphPositions,
   buildLogoPositions,
+  computeContactLayout,
   computeLogoLayout,
+  computePortraitLayout,
   generateFormations,
 } from "./formations";
 import {
@@ -22,23 +31,36 @@ import {
 
 // Valeur fixe de uProgress en reduced motion : on fige sur le reseau (formation
 // lisible et representative), sans aucun morphing ni mouvement continu.
-const REDUCED_PROGRESS = 0.34;
+const REDUCED_PROGRESS = 0.4;
 
 // Calage des formations sur les sections : chaque section vise une valeur de
-// uProgress (0 logo, 0.25 dispersion, 0.5 reseau, 0.75 flux, 1 structure). La
-// formation se forme quand la section est centree dans le viewport, et morphe
-// en douceur entre deux sections. Themes : Hero=marque, About=curiosite/chaos,
-// Skills=reseau de competences, Parcours=flux, Projets+suite=structure (resultat).
+// uProgress. La formation ILLUSTRE la section : 0 logo Epitech (hero, conserve),
+// 0.2 portrait (a propos), 0.4 reseau en grappes (competences), 0.6 frise
+// ascendante (parcours), 0.8 mur de cartes (projets), 1.0 glyphe "@" (contact).
 const SECTION_KEYFRAMES: Array<{ id: string; p: number }> = [
   { id: "hero", p: 0.0 },
-  { id: "about", p: 0.25 },
-  { id: "skills", p: 0.5 },
-  { id: "timeline", p: 0.75 },
-  { id: "projects", p: 1.0 },
-  { id: "stats", p: 1.0 },
-  { id: "testimonials", p: 1.0 },
+  { id: "about", p: 0.2 },
+  { id: "skills", p: 0.4 },
+  { id: "timeline", p: 0.6 },
+  { id: "projects", p: 0.8 },
+  { id: "stats", p: 0.8 },
+  { id: "testimonials", p: 0.8 },
   { id: "contact", p: 1.0 },
 ];
+
+// Rampe de couleurs des particules, calee sur les memes accents que l'UI
+// (voir lib/sectionTheme.ts) : la nuee change subtilement de teinte en
+// meme temps que les halos et boutons de la page.
+const COLOR_RAMP: Array<[string, string]> = [
+  ["#1f3cff", "#5ec8ff"], // hero      : bleu Epitech
+  ["#6366f1", "#a5b4fc"], // a propos  : indigo
+  ["#06b6d4", "#67e8f9"], // skills    : cyan
+  ["#3b82f6", "#93c5fd"], // parcours  : bleu clair
+  ["#8b5cf6", "#c4b5fd"], // projets   : violet
+  ["#e879f9", "#f0abfc"], // contact   : fuchsia
+];
+const RAMP_A = COLOR_RAMP.map(([a]) => new THREE.Color(a));
+const RAMP_B = COLOR_RAMP.map(([, b]) => new THREE.Color(b));
 
 interface SharedRefs {
   // Progression de scroll cible (0..1) et indicateur "la page est scrollable".
@@ -46,6 +68,8 @@ interface SharedRefs {
   scrollable: React.RefObject<boolean>;
   // Horodatage de la derniere interaction de scroll (pilotage du framerate).
   lastScroll: React.RefObject<number>;
+  // Vitesse de morphing lissee (0..1), partagee avec le post-processing.
+  velocity: React.RefObject<number>;
 }
 
 interface ParticlesProps extends SharedRefs {
@@ -59,6 +83,7 @@ function Particles({
   count,
   scrollProgress,
   scrollable,
+  velocity,
 }: ParticlesProps) {
   const groupRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
@@ -67,42 +92,54 @@ function Particles({
   // null => pilotage par le scroll (ou demo automatique si page trop courte).
   const manualProgress = useRef<number | null>(null);
 
-  const { logo, scatter, network, flow, structure, seeds } = useMemo(
-    () => generateFormations(count),
-    [count]
-  );
+  const { logo, scatter, portrait, network, timeline, cards, contact, seeds } =
+    useMemo(() => generateFormations(count), [count]);
 
-  // Accumulateur de rotation : la rotation s'efface pres du logo (en haut) pour
-  // qu'il reste face camera et lisible, puis s'installe en scrollant.
+  // Accumulateur de rotation : la rotation ne s'installe qu'autour du reseau
+  // (formation abstraite) ; les formations figuratives (logo, portrait, frise,
+  // cartes, "@") restent face camera pour rester lisibles.
   const spin = useRef(0);
 
-  // Uniforms crees une seule fois ; on met a jour uTime / uProgress dans la boucle.
+  // Uniforms crees une seule fois ; mis a jour dans la boucle de rendu.
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uSize: { value: 34 }, // points compacts : limite l'overdraw additif
       uPixelRatio: { value: cappedPixelRatio() },
       uReduced: { value: reduced ? 1 : 0 },
-      // On part legerement de la dispersion pour que la nuee "s'assemble" en
-      // logo au chargement (la cible au repos en haut de page est 0 = logo).
-      uProgress: { value: reduced ? REDUCED_PROGRESS : 0.22 },
+      uProgress: { value: 0 },
+      // Assemblage d'intro : la nuee arrive du chaos et forme le logo.
+      uIntro: { value: reduced ? 0 : 1 },
       uVelocity: { value: 0 },
-      uColorA: { value: new THREE.Color("#1f3cff") }, // bleu Epitech (identite)
-      uColorB: { value: new THREE.Color("#5ec8ff") }, // bleu clair (relief)
+      uColorA: { value: new THREE.Color(COLOR_RAMP[0][0]) },
+      uColorB: { value: new THREE.Color(COLOR_RAMP[0][1]) },
     }),
     // `reduced` ne change pas en cours de session ; capture initiale suffisante.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
-  // Re-echantillonne le logo : une fois la police Anton chargee, et a chaque
-  // changement de taille d'ecran (mise en page responsive du logo). Met a jour
-  // l'attribut aLogo en place. Debounce pour absorber les resize continus.
   const invalidate = useThree((s) => s.invalidate);
   // On selectionne des primitives (pas l'objet viewport) pour eviter tout
   // re-render superflu lors des redimensionnements.
   const vw = useThree((s) => s.viewport.width);
   const vh = useThree((s) => s.viewport.height);
+
+  // Met a jour un attribut en place (et repeint).
+  const setAttr = (name: string, arr: Float32Array) => {
+    const attr = groupRef.current?.geometry.getAttribute(name) as
+      | THREE.BufferAttribute
+      | undefined;
+    if (attr) {
+      (attr.array as Float32Array).set(arr);
+      attr.needsUpdate = true;
+      invalidate();
+    }
+  };
+
+  // Re-echantillonne les glyphes (logo "{ EPITECH }" et "@") : une fois la
+  // police Anton chargee, et a chaque changement de taille d'ecran.
+  // Debounce pour absorber les resize continus.
   useEffect(() => {
     let cancelled = false;
     const timer = setTimeout(() => {
@@ -116,26 +153,58 @@ function Particles({
           // police indisponible : on garde l'echantillonnage initial.
         }
         if (cancelled) return;
-        const layout = computeLogoLayout(vw, vh);
-        const arr = buildLogoPositions(count, scatter, layout);
-        const attr = groupRef.current?.geometry.getAttribute("aLogo") as
-          | THREE.BufferAttribute
-          | undefined;
-        if (attr) {
-          (attr.array as Float32Array).set(arr);
-          attr.needsUpdate = true;
-          invalidate();
-        }
+        setAttr(
+          "aLogo",
+          buildLogoPositions(count, scatter, computeLogoLayout(vw, vh))
+        );
+        setAttr(
+          "aContact",
+          buildContactPositions(count, scatter, computeContactLayout(vw, vh))
+        );
       })();
     }, 120);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count, scatter, vw, vh, invalidate]);
+
+  // Monogramme "FH." (section "A propos") : echo de la signature de la nav.
+  // On ne redessine PAS le portrait en particules (la photo est deja affichee
+  // juste a cote : ce serait un doublon).
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void (async () => {
+        try {
+          if (document.fonts?.load) {
+            await document.fonts.load('100px "Anton"');
+            await document.fonts.ready;
+          }
+        } catch {
+          // police indisponible : on garde l'echantillonnage initial.
+        }
+        if (cancelled) return;
+        const layout = computePortraitLayout(vw, vh);
+        setAttr(
+          "aPortrait",
+          buildGlyphPositions(count, scatter, [{ text: "FH.", size: 380 }], {
+            ...layout,
+            worldWidth: Math.min(layout.worldWidth * 1.5, 11),
+          })
+        );
+      })();
+    }, 200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count, scatter, vw, vh, invalidate]);
 
   // Outil de debug (dev uniquement) : permet de figer une formation precise
-  // depuis la console. window.__setProgress(0.66) ou window.__setProgress(null).
+  // depuis la console. window.__setProgress(0.6) ou window.__setProgress(null).
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const w = window as unknown as Record<string, unknown>;
@@ -150,8 +219,12 @@ function Particles({
     if (!mat) return;
 
     if (reduced) {
-      // Formation statique : rien ne bouge.
+      // Formation statique : rien ne bouge, teinte de la section figee.
       mat.uniforms.uProgress.value = REDUCED_PROGRESS;
+      mat.uniforms.uIntro.value = 0;
+      const i = Math.round(REDUCED_PROGRESS * 5);
+      (mat.uniforms.uColorA.value as THREE.Color).copy(RAMP_A[i]);
+      (mat.uniforms.uColorB.value as THREE.Color).copy(RAMP_B[i]);
       return;
     }
 
@@ -159,6 +232,15 @@ function Particles({
     // pour eviter tout saut a la reprise.
     const dt = Math.min(delta, 0.05);
     mat.uniforms.uTime.value += dt;
+
+    // Assemblage d'intro : uIntro decroit vers 0 (~1.6 s), la nuee converge
+    // du chaos vers le logo.
+    if (mat.uniforms.uIntro.value > 0.001) {
+      mat.uniforms.uIntro.value +=
+        (0 - mat.uniforms.uIntro.value) * Math.min(1, dt * 2.2);
+    } else {
+      mat.uniforms.uIntro.value = 0;
+    }
 
     // Cible de progression :
     //  - override manuel (debug) si defini ;
@@ -179,18 +261,32 @@ function Particles({
     const next = current + (target - current) * Math.min(1, dt * 3.2);
     mat.uniforms.uProgress.value = next;
 
-    // Vitesse de morphing (lissee) : alimente la teinte par la vitesse.
+    // Vitesse de morphing (lissee) : alimente la teinte + l'aberration
+    // chromatique du post-processing.
     const instant = Math.abs(next - current) / Math.max(dt, 0.0001);
     const vel = mat.uniforms.uVelocity.value;
-    mat.uniforms.uVelocity.value = vel + (instant * 1.4 - vel) * 0.12;
+    const smoothVel = vel + (instant * 1.4 - vel) * 0.12;
+    mat.uniforms.uVelocity.value = smoothVel;
+    velocity.current = smoothVel;
 
-    // Rotation : on accumule un spin lent, mais on l'efface pres du logo
-    // (uProgress proche de 0) pour le garder face camera et lisible.
-    spin.current += dt * 0.04;
+    // Couleurs : glissement le long de la rampe, cale sur uProgress (la nuee
+    // change de teinte en meme temps que l'UI de la section visible).
+    const t = Math.min(Math.max(next, 0), 1) * (COLOR_RAMP.length - 1);
+    const i0 = Math.min(Math.floor(t), COLOR_RAMP.length - 2);
+    const f = t - i0;
+    (mat.uniforms.uColorA.value as THREE.Color)
+      .copy(RAMP_A[i0])
+      .lerp(RAMP_A[i0 + 1], f);
+    (mat.uniforms.uColorB.value as THREE.Color)
+      .copy(RAMP_B[i0])
+      .lerp(RAMP_B[i0 + 1], f);
+
+    // Rotation : uniquement autour du reseau (p ~ 0.4), seule formation
+    // abstraite qui gagne a tourner. Fenetre gaussienne douce.
+    spin.current += dt * 0.05;
     if (groupRef.current) {
-      let r = (next - 0.05) / 0.12;
-      r = Math.max(0, Math.min(1, r));
-      const reveal = r * r * (3 - 2 * r); // smoothstep
+      const d = (next - 0.4) / 0.09;
+      const reveal = Math.exp(-d * d);
       groupRef.current.rotation.y = spin.current * reveal;
       groupRef.current.rotation.x = spin.current * 0.28 * reveal;
     }
@@ -201,12 +297,11 @@ function Particles({
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[scatter, 3]} />
         <bufferAttribute attach="attributes-aLogo" args={[logo, 3]} />
+        <bufferAttribute attach="attributes-aPortrait" args={[portrait, 3]} />
         <bufferAttribute attach="attributes-aNetwork" args={[network, 3]} />
-        <bufferAttribute attach="attributes-aFlow" args={[flow, 3]} />
-        <bufferAttribute
-          attach="attributes-aStructure"
-          args={[structure, 3]}
-        />
+        <bufferAttribute attach="attributes-aTimeline" args={[timeline, 3]} />
+        <bufferAttribute attach="attributes-aCards" args={[cards, 3]} />
+        <bufferAttribute attach="attributes-aContact" args={[contact, 3]} />
         <bufferAttribute attach="attributes-aSeed" args={[seeds, 1]} />
       </bufferGeometry>
       <shaderMaterial
@@ -268,7 +363,27 @@ function RenderDriver({
   return null;
 }
 
-/** Fallback sobre quand WebGL n'est pas disponible : halo radial violet. */
+/**
+ * Aberration chromatique pilotee par la vitesse de morphing : les couleurs se
+ * dedoublent pendant les transitions rapides (effet "lentille" cinetique),
+ * et redeviennent parfaitement nettes au repos.
+ */
+function AberrationDriver({
+  velocity,
+  offset,
+}: {
+  velocity: React.RefObject<number>;
+  offset: THREE.Vector2;
+}) {
+  useFrame(() => {
+    const v = Math.min(velocity.current, 1);
+    offset.x = v * 0.0022;
+    offset.y = v * 0.0012;
+  });
+  return null;
+}
+
+/** Fallback sobre quand WebGL n'est pas disponible : halos d'accent. */
 function FieldFallback() {
   return (
     <div
@@ -276,7 +391,7 @@ function FieldFallback() {
       className="pointer-events-none fixed inset-0 -z-0"
       style={{
         background:
-          "radial-gradient(40rem 32rem at 70% 30%, rgba(31,60,255,0.18), transparent 60%), radial-gradient(36rem 36rem at 15% 75%, rgba(94,200,255,0.08), transparent 60%)",
+          "radial-gradient(40rem 32rem at 70% 30%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%), radial-gradient(36rem 36rem at 15% 75%, color-mix(in srgb, var(--color-accent-bright) 8%, transparent), transparent 60%)",
       }}
     />
   );
@@ -291,14 +406,16 @@ export default function ParticleField() {
   const [webgl] = useState(() => hasWebGL());
 
   // Profil de rendu : sur un moteur logiciel/bas de gamme, on reduit le nombre
-  // de particules et on coupe le bloom pour preserver la fluidite.
+  // de particules et on coupe le post-processing pour preserver la fluidite.
   const [software] = useState(() => isSoftwareRenderer());
   const count = software ? 8000 : getParticleCount();
-  const enableBloom = !software;
+  const enableFx = !software;
 
   const scrollProgress = useRef(0);
   const scrollable = useRef(false);
   const lastScroll = useRef(performance.now());
+  const velocity = useRef(0);
+  const [caOffset] = useState(() => new THREE.Vector2(0, 0));
 
   // Pilotage du morphing cale sur les sections. On lit la position reelle de
   // chaque section pour construire une table d'ancrages (scrollY -> uProgress)
@@ -356,11 +473,17 @@ export default function ParticleField() {
     const t2 = setTimeout(rebuild, 1500);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", rebuild);
+    // La hauteur de page change aussi quand le contenu change (filtres de la
+    // grille projets, modale...) : on re-ancre les formations a chaque
+    // changement de taille du body, sinon le morphing se decale des sections.
+    const ro = new ResizeObserver(() => rebuild());
+    ro.observe(document.body);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", rebuild);
+      ro.disconnect();
     };
   }, []);
 
@@ -386,21 +509,27 @@ export default function ParticleField() {
           scrollProgress={scrollProgress}
           scrollable={scrollable}
           lastScroll={lastScroll}
+          velocity={velocity}
         />
         <RenderDriver reduced={reduced} lastScroll={lastScroll} />
-        {/* Bloom : le glow qui fait l'effet "waw". Intensite maitrisee, seuil
-            bas et noyau reduit (KernelSize.SMALL) pour rester performant et ne
-            jamais cramer en blanc. Desactive sur moteur logiciel. */}
-        {enableBloom && (
-          <EffectComposer>
-            <Bloom
-              intensity={0.55}
-              luminanceThreshold={0.18}
-              luminanceSmoothing={0.3}
-              radius={0.6}
-              mipmapBlur
-            />
-          </EffectComposer>
+        {/* Post-processing : bloom (glow), aberration chromatique cinetique
+            (uniquement pendant les transitions rapides) et vignette douce.
+            Desactive sur moteur logiciel. */}
+        {enableFx && (
+          <>
+            <AberrationDriver velocity={velocity} offset={caOffset} />
+            <EffectComposer>
+              <Bloom
+                intensity={0.55}
+                luminanceThreshold={0.18}
+                luminanceSmoothing={0.3}
+                radius={0.6}
+                mipmapBlur
+              />
+              <ChromaticAberration offset={caOffset} />
+              <Vignette offset={0.24} darkness={0.55} />
+            </EffectComposer>
+          </>
         )}
       </Canvas>
     </div>

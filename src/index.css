@@ -7,6 +7,26 @@
    toutes les utilities (bg-bg, text-fg, border-line, text-accent, etc.).
    ========================================================================== */
 
+/* Les variables d'accent sont ENREGISTREES comme couleurs (@property) pour
+   pouvoir etre animees : quand la section visible change, le JS met a jour
+   ces variables sur <html> et la transition CSS fait glisser TOUTE la palette
+   (boutons, halos, liens, glow) vers la teinte de la section. */
+@property --color-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f3cff;
+}
+@property --color-accent-bright {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #5e79ff;
+}
+@property --color-accent-dim {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1730d0;
+}
+
 @theme {
   /* ----- Couleurs : fonds, surfaces, texte ----- */
   --color-bg: #0a0a0b; /* fond profond principal */
@@ -29,19 +49,21 @@
   /* Teinte accent en rgb pour composer des rgba() (glow, halos) */
   --color-accent-rgb: 31, 60, 255;
 
-  /* ----- Typographie : Geist (display + UI), Geist Mono (eyebrows) ----- */
+  /* ----- Typographie : Anton (display), Geist (UI), Geist Mono (eyebrows) ----- */
   --font-sans: "Geist Variable", "Inter Variable", ui-sans-serif, system-ui,
     sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", monospace;
+  --font-display: "Anton", "Arial Black", ui-sans-serif, sans-serif;
 
-  /* ----- Echelle typographique fluide (clamp) pour les grands titres ----- */
-  --text-display: clamp(2.75rem, 7vw, 6.5rem);
-  --text-display--line-height: 0.95;
-  --text-display--letter-spacing: -0.04em;
+  /* ----- Echelle typographique fluide (clamp) pour les grands titres -----
+     Display en Anton (condense, tres grand) : le nom occupe l'ecran. */
+  --text-display: clamp(3.5rem, 11vw, 10.5rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: 0.005em;
 
-  --text-h2: clamp(2rem, 4.5vw, 3.5rem);
-  --text-h2--line-height: 1.02;
-  --text-h2--letter-spacing: -0.03em;
+  --text-h2: clamp(2.4rem, 5.5vw, 4.5rem);
+  --text-h2--line-height: 0.98;
+  --text-h2--letter-spacing: 0.01em;
 
   /* ----- Rythme / rayons ----- */
   --radius-xl: 1.25rem;
@@ -58,6 +80,20 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Glissement de palette quand la section visible change (JS -> variables) */
+    transition:
+      --color-accent 0.9s ease,
+      --color-accent-bright 0.9s ease,
+      --color-accent-dim 0.9s ease;
+  }
+
+  /* Curseur custom (dot + follower) : on masque le curseur natif uniquement
+     sur les peripheriques de pointage precis, jamais au tactile. */
+  @media (pointer: fine) {
+    html.custom-cursor,
+    html.custom-cursor * {
+      cursor: none !important;
+    }
   }
 
   * {
@@ -87,12 +123,12 @@
     background-image:
       radial-gradient(
         60rem 60rem at 80% -10%,
-        rgba(var(--color-accent-rgb), 0.1),
+        color-mix(in srgb, var(--color-accent) 10%, transparent),
         transparent 60%
       ),
       radial-gradient(
         50rem 50rem at -10% 20%,
-        rgba(var(--color-accent-rgb), 0.06),
+        color-mix(in srgb, var(--color-accent) 6%, transparent),
         transparent 55%
       );
     background-attachment: fixed;
@@ -100,7 +136,7 @@
 
   /* Selection a l'accent */
   ::selection {
-    background-color: rgba(var(--color-accent-rgb), 0.28);
+    background-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
     color: var(--color-fg);
   }
 
@@ -122,7 +158,7 @@
     border: 2px solid var(--color-bg);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--color-accent-rgb), 0.5);
+    background: color-mix(in srgb, var(--color-accent) 50%, transparent);
   }
 }
 
@@ -219,7 +255,7 @@
       rgba(255, 255, 255, 0.1) 0%,
       transparent 28%,
       transparent 72%,
-      rgba(var(--color-accent-rgb), 0.06) 100%
+      color-mix(in srgb, var(--color-accent) 6%, transparent) 100%
     );
   }
 
@@ -257,9 +293,76 @@
     background: linear-gradient(
       to bottom,
       rgba(10, 10, 11, 0) 0,
-      rgba(10, 10, 11, 0.78) 160px,
-      rgba(10, 10, 11, 0.82) 100%
+      rgba(10, 10, 11, 0.68) 160px,
+      rgba(10, 10, 11, 0.74) 100%
     );
+  }
+
+  /* ----- TITRES DISPLAY (Anton) -----
+     Grands titres condenses en capitales : la signature editoriale du site. */
+  .title-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+    letter-spacing: var(--text-display--letter-spacing);
+  }
+  .title-h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    letter-spacing: var(--text-h2--letter-spacing);
+  }
+
+  /* Texte en contour (stroke) : utilise en alternance dans les marquees et
+     pour les numeros d'index des projets. */
+  .text-outline {
+    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.32);
+    color: transparent;
+  }
+  .text-outline-accent {
+    -webkit-text-stroke: 1.5px
+      color-mix(in srgb, var(--color-accent-bright) 75%, transparent);
+    color: transparent;
+  }
+
+  /* Lien avec soulignement anime (croissance de gauche a droite) */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 0.35s var(--ease-out-soft),
+      color 0.25s ease;
+    padding-bottom: 2px;
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* ----- MARQUEE -----
+     Bandeau typographique defilant en continu (contenu duplique 2x dans le
+     DOM, translation de -50% en boucle => defilement parfait). */
+  @keyframes marquee-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
   }
 
   /* Grain / noise subtil applique en overlay fixe (voir .grain plus bas) */

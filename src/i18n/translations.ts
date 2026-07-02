@@ -43,8 +43,10 @@ const fr = {
   projects: {
     eyebrow: "Réalisations",
     title: "Projets",
-    subtitle: "Sélection de projets Epitech et de stage, filtrables par domaine.",
+    subtitle:
+      "Mes 5 meilleurs projets. Explorez les catégories pour tout découvrir.",
     all: "Tous",
+    top5: "Top 5",
     grade: "Note",
     noGrade: "Non noté",
     module: "Module",
@@ -66,6 +68,9 @@ const fr = {
     subtitle:
       "Une opportunité, une question, un projet ? Je réponds rapidement.",
     emailCta: "M'écrire un mail",
+  },
+  marquee: {
+    contact: ["Travaillons ensemble", "Une idée ?", "Parlons-en"],
   },
   footer: {
     built: "Conçu et développé par",
@@ -115,8 +120,9 @@ const en: Dict = {
   projects: {
     eyebrow: "Work",
     title: "Projects",
-    subtitle: "A selection of Epitech and internship projects, filterable by domain.",
+    subtitle: "My 5 best projects. Browse the categories to see everything.",
     all: "All",
+    top5: "Top 5",
     grade: "Grade",
     noGrade: "Not graded",
     module: "Module",
@@ -137,6 +143,9 @@ const en: Dict = {
     title: "Let's work together",
     subtitle: "An opportunity, a question, a project? I reply quickly.",
     emailCta: "Send me an email",
+  },
+  marquee: {
+    contact: ["Let's work together", "Got an idea?", "Let's talk"],
   },
   footer: {
     built: "Designed and built by",

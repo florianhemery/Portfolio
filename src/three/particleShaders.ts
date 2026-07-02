@@ -1,7 +1,9 @@
 // Shaders GLSL du champ de particules.
-// Vertex : morphing entre 4 formations (uProgress) + curl noise organique.
-// Fragment : point rond lumineux, teinte violette dominante variant selon la
-// profondeur et la vitesse de morphing (relief).
+// Vertex : morphing entre 6 formations (uProgress) avec "detour" par la
+// dispersion au milieu de chaque transition (la nuee eclate puis se reforme),
+// + curl noise organique attenue quand une formation est nettement formee.
+// Fragment : point rond lumineux, teinte pilotee par les uniforms de couleur
+// (elles glissent selon la section visible), relief par profondeur/vitesse.
 
 // Bruit simplex 3D (Ashima Arts / Stefan Gustavson, domaine public) utilise
 // pour generer un curl noise (mouvement permanent sans divergence).
@@ -70,51 +72,66 @@ export const particleVertexShader = /* glsl */ `
   uniform float uPixelRatio;
   uniform float uReduced;  // 1.0 si l'utilisateur a reduit les animations
   uniform float uProgress; // 0..1 : progression dans l'enchainement des formations
+  uniform float uIntro;    // 1 -> 0 au chargement : la nuee s'assemble depuis le chaos
 
-  // position = dispersion. Les autres formations sont des attributs.
-  attribute vec3 aLogo;      // formation 0 : logo "{ EPITECH }" (depart)
-  attribute vec3 aNetwork;   // formation 2 : reseau de noeuds
-  attribute vec3 aFlow;      // formation 3 : flux / pipeline
-  attribute vec3 aStructure; // formation 4 : structure ordonnee
-  attribute float aSeed;     // graine aleatoire par particule (0..1)
+  // position = dispersion (matiere de transition). Formations en attributs :
+  attribute vec3 aLogo;     // 0.0 : logo "{ EPITECH }"  (hero)
+  attribute vec3 aPortrait; // 0.2 : portrait photo      (a propos)
+  attribute vec3 aNetwork;  // 0.4 : reseau en grappes   (competences)
+  attribute vec3 aTimeline; // 0.6 : frise ascendante    (parcours)
+  attribute vec3 aCards;    // 0.8 : mur de cartes       (projets)
+  attribute vec3 aContact;  // 1.0 : glyphe "@"          (contact)
+  attribute float aSeed;    // graine aleatoire par particule (0..1)
 
   varying float vDepth;
   varying float vSeed;
 
   ${glslSimplexNoise}
 
-  // Interpole entre les 5 formations selon uProgress (4 segments egaux) :
-  // logo -> dispersion -> reseau -> flux -> structure. Lissage par smoothstep.
-  vec3 morph(vec3 scatter) {
-    float seg = clamp(uProgress, 0.0, 1.0) * 4.0;
-    vec3 a;
-    vec3 b;
-    float lt;
-    if (seg < 1.0) {
-      a = aLogo; b = scatter; lt = seg;
-    } else if (seg < 2.0) {
-      a = scatter; b = aNetwork; lt = seg - 1.0;
-    } else if (seg < 3.0) {
-      a = aNetwork; b = aFlow; lt = seg - 2.0;
-    } else {
-      a = aFlow; b = aStructure; lt = seg - 3.0;
-    }
-    lt = smoothstep(0.0, 1.0, clamp(lt, 0.0, 1.0));
-    return mix(a, b, lt);
+  // Interpole entre les 6 formations selon uProgress (5 segments egaux), avec
+  // un detour par la dispersion au coeur de chaque transition : la nuee
+  // "explose" puis se recompose en formation suivante.
+  vec3 morph(vec3 scatter, out float formed) {
+    float seg = clamp(uProgress, 0.0, 1.0) * 5.0;
+    vec3 a; vec3 b; float lt;
+    if (seg < 1.0)      { a = aLogo;     b = aPortrait; lt = seg; }
+    else if (seg < 2.0) { a = aPortrait; b = aNetwork;  lt = seg - 1.0; }
+    else if (seg < 3.0) { a = aNetwork;  b = aTimeline; lt = seg - 2.0; }
+    else if (seg < 4.0) { a = aTimeline; b = aCards;    lt = seg - 3.0; }
+    else                { a = aCards;    b = aContact;  lt = seg - 4.0; }
+    lt = clamp(lt, 0.0, 1.0);
+    float smoothLt = smoothstep(0.0, 1.0, lt);
+    vec3 pos = mix(a, b, smoothLt);
+
+    // Detour par le chaos : nul aux extremites (formations nettes), maximal
+    // au milieu de la transition. Ecarte legerement selon la graine pour un
+    // eclatement irregulier, plus organique.
+    float burst = sin(3.14159265 * lt);
+    pos = mix(pos, scatter, burst * (0.3 + aSeed * 0.15));
+
+    // "formed" = 1 pile sur une formation, 0 en pleine transition.
+    formed = 1.0 - burst;
+    return pos;
   }
 
   void main() {
-    vec3 p = morph(position);
+    float formed;
+    vec3 p = morph(position, formed);
 
-    // Curl noise permanent, attenue pres du logo (depart) et de la structure
-    // finale (ces formations doivent rester nettes), coupe en reduced motion.
-    float structureWeight = smoothstep(0.78, 1.0, uProgress);
-    float logoWeight = smoothstep(0.12, 0.0, uProgress);
-    float move = (1.0 - uReduced)
-      * (1.0 - structureWeight * 0.9)
-      * (1.0 - logoWeight * 0.92);
+    // Assemblage d'intro : au chargement la nuee arrive du chaos vers le logo.
+    p = mix(p, position, uIntro);
+
+    // Curl noise permanent : discret quand une formation est formee (elle doit
+    // rester lisible : logo, portrait, "@"...), ample en pleine transition.
+    float seg = clamp(uProgress, 0.0, 1.0) * 5.0;
+    float idx = floor(seg + 0.5);
+    // Formations "typographiques" (logo, portrait, @) : quasi immobiles.
+    float isText = (idx < 1.5 || idx > 4.5) ? 1.0 : 0.0;
+    float rest = mix(0.16, 0.05, isText);
+    float move = (1.0 - uReduced) * mix(1.0, rest, formed);
+    move = max(move, uIntro * (1.0 - uReduced)); // l'intro reste vivante
     vec3 flow = organicNoise(p * 0.22 + vec3(0.0, 0.0, uTime * 0.06));
-    p += flow * 0.3 * move;
+    p += flow * 0.32 * move;
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     vDepth = -mv.z;
@@ -129,8 +146,8 @@ export const particleVertexShader = /* glsl */ `
 export const particleFragmentShader = /* glsl */ `
   precision highp float;
 
-  uniform vec3 uColorA;    // violet accent (identite)
-  uniform vec3 uColorB;    // froid (indigo / cyan) pour le relief
+  uniform vec3 uColorA;    // accent de la section courante (identite)
+  uniform vec3 uColorB;    // teinte claire associee (relief)
   uniform float uVelocity; // vitesse globale de morphing (0..1 apres lissage)
 
   varying float vDepth;
@@ -145,8 +162,8 @@ export const particleFragmentShader = /* glsl */ `
     // Falloff doux du centre vers le bord -> halo (rendu additif).
     float alpha = smoothstep(0.5, 0.0, d);
 
-    // Teinte : violet dominant, derive froide selon la profondeur, la graine
-    // et la vitesse (les particules en transition rapide tirent vers le froid).
+    // Teinte : accent dominant, derive claire selon la profondeur, la graine
+    // et la vitesse (les particules en transition rapide tirent vers le clair).
     float vel = clamp(uVelocity, 0.0, 1.0);
     float t = clamp((vDepth - 9.0) / 20.0, 0.0, 1.0);
     vec3 col = mix(uColorA, uColorB, t * 0.32 + vSeed * 0.06 + vel * 0.22);
@@ -154,8 +171,8 @@ export const particleFragmentShader = /* glsl */ `
     // Leger surcroit de luminosite avec la vitesse (le bloom s'en empare).
     col *= 1.0 + vel * 0.25;
 
-    // L'additif sature vite vers le bleu : on attenue l'alpha dans les zones
-    // denses pour preserver la teinte violette.
+    // L'additif sature vite : on attenue l'alpha dans les zones denses pour
+    // preserver la teinte.
     gl_FragColor = vec4(col, alpha * 0.6);
   }
 `;

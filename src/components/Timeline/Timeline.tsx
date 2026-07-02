@@ -12,6 +12,7 @@ export default function Timeline() {
   return (
     <Section
       id="timeline"
+      index={3}
       eyebrow={t.timeline.eyebrow}
       title={t.timeline.title}
       subtitle={t.timeline.subtitle}

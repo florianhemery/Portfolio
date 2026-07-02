@@ -2,20 +2,24 @@ import { motion, useReducedMotion } from "motion/react";
 import { content } from "../../config/content";
 import { useLang } from "../../i18n/LangContext";
 import { springSoft } from "../../lib/animations";
+import Magnetic from "../ui/Magnetic";
+import RevealText from "../ui/RevealText";
+
+interface HeroProps {
+  /** false tant que le preloader est a l'ecran : la cascade attend le rideau. */
+  start: boolean;
+}
 
 /**
  * Hero : premiere impression du portfolio.
- * Entree en cascade (eyebrow, nom, titre, sous-titre, CTA) avec spring physics.
- * Toutes les animations se replient sur un simple fondu si l'utilisateur a
- * demande la reduction des animations au niveau de l'OS.
+ * Nom en Anton geant revele mot a mot sous masque, cascade d'entree (eyebrow,
+ * titre, CTA magnetiques) declenchee a la fin du preloader. Tout se replie sur
+ * un simple fondu si l'utilisateur a demande la reduction des animations.
  */
-export default function Hero() {
+export default function Hero({ start }: HeroProps) {
   const { personal } = content;
   const { t } = useLang();
   const reduce = useReducedMotion();
-
-  const [firstName, ...rest] = personal.name.split(" ");
-  const lastName = rest.join(" ");
 
   // Variants locaux, accordes au reglage "reduce motion".
   const container = {
@@ -56,7 +60,7 @@ export default function Hero() {
         className="container-editorial relative"
         variants={container}
         initial="hidden"
-        animate="show"
+        animate={start ? "show" : "hidden"}
       >
         {/* Eyebrow : statut + promo */}
         <motion.div
@@ -73,14 +77,16 @@ export default function Hero() {
           <span className="eyebrow">{personal.subtitle.replace(/—/g, "-")}</span>
         </motion.div>
 
-        {/* Nom : titre display, tres grand et serre */}
-        <motion.h1
-          variants={item}
-          className="font-sans text-[length:var(--text-display)] leading-[var(--text-display--line-height)] tracking-[var(--text-display--letter-spacing)] font-semibold"
-        >
-          <span className="block text-fg">{firstName}</span>
-          <span className="block text-gradient-accent">{lastName}</span>
-        </motion.h1>
+        {/* Nom : Anton geant, chaque mot revele sous masque. Les variants sont
+            herites du conteneur (hidden tant que le preloader est a l'ecran). */}
+        <h1 className="title-display">
+          <span className="block text-fg">
+            <RevealText text="Florian" inView={false} />
+          </span>
+          <span className="block text-gradient-accent">
+            <RevealText text="Hémery" inView={false} delay={0.12} />
+          </span>
+        </h1>
 
         {/* Titre de poste */}
         <motion.p
@@ -98,23 +104,27 @@ export default function Hero() {
           {t.hero.accroche}
         </motion.p>
 
-        {/* CTA : projets + contact */}
+        {/* CTA : projets + contact, magnetiques */}
         <motion.div variants={item} className="mt-10 flex flex-wrap gap-4">
-          <a
-            href="#projects"
-            className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition-transform duration-200 hover:scale-[1.03] focus-visible:scale-[1.03]"
-          >
-            {t.hero.ctaProjects}
-            <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-              →
-            </span>
-          </a>
-          <a
-            href="#contact"
-            className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-fg transition-colors duration-200 hover:text-accent"
-          >
-            {t.hero.ctaContact}
-          </a>
+          <Magnetic>
+            <a
+              href="#projects"
+              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-white transition-colors duration-300"
+            >
+              {t.hero.ctaProjects}
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
+            </a>
+          </Magnetic>
+          <Magnetic>
+            <a
+              href="#contact"
+              className="glass inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-fg transition-colors duration-200 hover:text-accent-bright"
+            >
+              {t.hero.ctaContact}
+            </a>
+          </Magnetic>
         </motion.div>
 
         {/* Liens rapides */}
@@ -126,7 +136,7 @@ export default function Hero() {
             href={personal.github}
             target="_blank"
             rel="noreferrer"
-            className="transition-colors hover:text-fg"
+            className="link-underline transition-colors hover:text-fg"
           >
             GitHub
           </a>
@@ -134,18 +144,38 @@ export default function Hero() {
             href={personal.linkedin}
             target="_blank"
             rel="noreferrer"
-            className="transition-colors hover:text-fg"
+            className="link-underline transition-colors hover:text-fg"
           >
             LinkedIn
           </a>
           <a
             href={`mailto:${personal.email}`}
-            className="transition-colors hover:text-fg"
+            className="link-underline transition-colors hover:text-fg"
           >
             {personal.email}
           </a>
         </motion.div>
       </motion.div>
+
+      {/* Indicateur de scroll : petit fil vertical anime en bas de l'ecran */}
+      {!reduce && (
+        <motion.div
+          aria-hidden
+          className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: start ? 1 : 0 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
+        >
+          <span className="eyebrow">{t.hero.scroll}</span>
+          <span className="relative block h-12 w-px overflow-hidden bg-white/15">
+            <motion.span
+              className="absolute left-0 top-0 block h-4 w-px bg-accent-bright"
+              animate={{ y: [-16, 48] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </span>
+        </motion.div>
+      )}
     </section>
   );
 }

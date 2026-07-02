@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
+import { AnimatePresence } from "motion/react";
 import Nav from "./components/Nav/Nav";
 import Hero from "./components/Hero/Hero";
 import About from "./components/About/About";
@@ -8,8 +9,12 @@ import Projects from "./components/Projects/Projects";
 import Stats from "./components/Stats/Stats";
 import Testimonials from "./components/Testimonials/Testimonials";
 import Contact from "./components/Contact/Contact";
+import Cursor from "./components/Cursor";
+import Marquee from "./components/Marquee";
+import Preloader from "./components/Preloader";
 import { content } from "./config/content";
 import { useLang } from "./i18n/LangContext";
+import { useSectionTheme } from "./lib/sectionTheme";
 
 // Couche 3D chargee paresseusement : elle ne doit jamais bloquer le 1er rendu.
 const ParticleField = lazy(() => import("./three/ParticleField"));
@@ -18,8 +23,26 @@ export default function App() {
   const { personal } = content;
   const { t } = useLang();
 
+  // false tant que le preloader est a l'ecran : le hero attend le rideau.
+  const [booted, setBooted] = useState(false);
+
+  // La palette d'accent glisse selon la section visible (bleu Epitech au hero,
+  // indigo, cyan, violet... fuchsia au contact). Voir lib/sectionTheme.ts.
+  useSectionTheme();
+
+  // Bandeau defilant : les technos phares, en Anton geant.
+  const marqueeSkills = content.skills.slice(0, 10).map((s) => s.name);
+
   return (
     <>
+      {/* Preloader : compteur %, rideau qui se leve, puis cascade du hero. */}
+      <AnimatePresence>
+        {!booted && <Preloader onDone={() => setBooted(true)} />}
+      </AnimatePresence>
+
+      {/* Curseur custom (dot + follower magnetique), pointeurs precis only. */}
+      <Cursor />
+
       {/* Champ de particules WebGL, fixe en fond de page (derriere le contenu). */}
       <Suspense fallback={null}>
         <ParticleField />
@@ -32,16 +55,20 @@ export default function App() {
 
         <main>
           {/* Hero : transparent, pleine puissance du champ de particules. */}
-          <Hero />
+          <Hero start={booted} />
 
           {/* Sections de contenu sur voile sombre pour la lisibilite. */}
           <div className="content-scrim">
             <About />
+            {/* Respiration typographique : les technos phares en defile */}
+            <Marquee items={marqueeSkills} duration={34} />
             <Skills />
             <Timeline />
             <Projects />
             <Stats />
             <Testimonials />
+            {/* Invitation au contact, en grand */}
+            <Marquee items={t.marquee.contact} duration={22} />
             <Contact />
           </div>
         </main>
